@@ -1,14 +1,29 @@
 // Shared utility helpers (formatting, dates, CSV/JSON export)
 
-export const CURRENCY = "USD";
+export const CURRENCY = "AZN";
 
+/**
+ * Format a number as Azerbaijani Manat.
+ *
+ * Output:  "1,250.00 ₼"
+ *   • Comma  → thousands separator   (1,250)
+ *   • Dot    → decimal separator     (.00)
+ *   • ₼      → symbol after the amount, separated by a thin non-breaking space (U+202F)
+ *
+ * We use "en-US" locale explicitly (not the system locale) so the
+ * comma/dot format is always consistent regardless of the user's OS
+ * language settings.  Then we append the ₼ symbol manually instead of
+ * relying on Intl's AZN rendering, which varies across browsers/OS versions
+ * (some output "AZN", some "man.", few show "₼" correctly).
+ */
 export function formatCurrency(value) {
   const number = Number.isFinite(value) ? value : 0;
-  return number.toLocaleString(undefined, {
-    style: "currency",
-    currency: CURRENCY,
+  const formatted = number.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  // U+202F = NARROW NO-BREAK SPACE — standard fintech thin-space before/after currency symbol
+  return formatted + "\u202F\u20BC";
 }
 
 export function parseNumber(value) {
@@ -26,7 +41,7 @@ export function monthKeyFromISO(dateISO) {
 }
 
 export function deepClone(value) {
-  // Use native structuredClone when available; fall back to JSON.
+  // Use native structuredClone when available; fall back to JSON round-trip.
   if (typeof structuredClone === "function") {
     return structuredClone(value);
   }
@@ -56,7 +71,6 @@ export function toCSV(rows, { includeHeader = true } = {}) {
     }
     return s;
   };
-
   const lines = [];
   if (includeHeader) {
     lines.push(headers.map(escape).join(","));
@@ -66,4 +80,3 @@ export function toCSV(rows, { includeHeader = true } = {}) {
   }
   return lines.join("\n");
 }
-
