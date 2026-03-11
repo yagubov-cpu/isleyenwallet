@@ -356,21 +356,55 @@
             <p class="section-sub">Deep dive into your financial patterns</p>
           </div>
         </div>
+
+        <!-- Row 1: Net Worth Trend (full width) -->
         <div class="analytics-grid">
           <div class="card panel analytics-grid--full">
             <div class="panel-header">
               <div class="panel-title-group">
-                <h3 class="panel-title">Monthly Cash Flow Trend</h3>
-                <span class="panel-sub">Income vs expenses by month</span>
+                <h3 class="panel-title">Net Worth Trend</h3>
+                <span class="panel-sub">Total balance growth over time</span>
               </div>
             </div>
-            <div class="chart-wrap-tall chart-wrap-xl"><canvas id="chart-monthly-2"></canvas></div>
+            <div class="chart-wrap-tall chart-wrap-xl"><canvas id="chart-networth"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Row 2: Income vs Expenses + Spending by Category -->
+        <div class="analytics-grid">
+          <div class="card panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Income vs Expenses</h3>
+                <span class="panel-sub">Monthly comparison</span>
+              </div>
+            </div>
+            <div class="chart-wrap-tall"><canvas id="chart-monthly-2"></canvas></div>
           </div>
           <div class="card panel">
-            <div class="panel-header"><h3 class="panel-title">Spending by Category</h3></div>
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Spending by Category</h3>
+                <span class="panel-sub">Where your money goes</span>
+              </div>
+            </div>
             <div class="chart-wrap-tall"><canvas id="chart-category-2"></canvas></div>
           </div>
         </div>
+
+        <!-- Row 3: Savings Rate (full width) -->
+        <div class="analytics-grid">
+          <div class="card panel analytics-grid--full">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Savings Rate</h3>
+                <span class="panel-sub">Percentage of income saved each month</span>
+              </div>
+            </div>
+            <div class="chart-wrap-tall chart-wrap-xl"><canvas id="chart-savings-rate"></canvas></div>
+          </div>
+        </div>
+
         <p class="footer-note">Transaction data is stored in Supabase. Wallet accounts are saved locally in your browser.</p>
       </div>
     </section>
