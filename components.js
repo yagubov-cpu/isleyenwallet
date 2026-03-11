@@ -17,7 +17,7 @@ import {
   updateWallet,
 } from "./services.js";
 
-import { downloadFile, formatCurrency, toCSV, todayISO } from "./utils.js";
+import { downloadFile, formatCurrency, generateInsights, toCSV, todayISO } from "./utils.js";
 import { initCharts, updateCharts } from "./charts.js";
 
 export async function initApp() {
@@ -771,6 +771,20 @@ function renderAnalytics(els, analytics) {
   els.totalIncome.textContent    = formatCurrency(analytics.totalIncome);
   els.totalExpenses.textContent  = formatCurrency(analytics.totalExpenses);
   els.netBalance.textContent     = formatCurrency(analytics.net);
+  renderInsightBanner(analytics);
+}
+
+function renderInsightBanner(analytics) {
+  const banner = document.getElementById("insight-banner");
+  const textEl = document.getElementById("insight-banner-text");
+  if (!banner || !textEl) return;
+  const insights = generateInsights(analytics);
+  if (!insights.length) {
+    banner.style.display = "none";
+    return;
+  }
+  textEl.textContent = insights[0];
+  banner.style.display = "flex";
 }
 
 /**
