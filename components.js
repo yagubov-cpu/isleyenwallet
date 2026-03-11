@@ -206,12 +206,19 @@ function resetWalletForm(els) {
 function wireWalletForm(els) {
   resetWalletForm(els);
   els.walletCancelEdit.addEventListener("click", () => resetWalletForm(els));
-  els.walletForm.addEventListener("submit", (event) => {
+  els.walletForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     els.walletError.textContent = "";
     const id = els.walletId.value || null;
     const payload = { name: els.walletName.value, type: els.walletType.value, startingBalance: els.walletBalance.value };
-    const result = id ? updateWallet(id, payload) : addWallet(payload);
+
+    const submitBtn = els.walletSubmitButton;
+    const origText  = submitBtn ? submitBtn.textContent : "";
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Saving…"; }
+
+    const result = await (id ? updateWallet(id, payload) : addWallet(payload));
+
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = origText; }
     if (result.error) { els.walletError.textContent = result.error; return; }
     resetWalletForm(els);
     renderWallets(els);
@@ -224,7 +231,7 @@ function wireWalletForm(els) {
 }
 
 function wireWalletList(els) {
-  els.walletList.addEventListener("click", (event) => {
+  els.walletList.addEventListener("click", async (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const row = target.closest(".wallet-row");
@@ -247,7 +254,10 @@ function wireWalletList(els) {
       const wallet = findWallet(id);
       if (!wallet) return;
       if (!window.confirm(`Delete wallet "${wallet.name}"?\n\nIf it has transactions, delete those first.`)) return;
-      const result = deleteWallet(id);
+      const deleteBtn = target.closest(".wallet-delete");
+      if (deleteBtn) { deleteBtn.disabled = true; deleteBtn.textContent = "…"; }
+      const result = await deleteWallet(id);
+      if (deleteBtn) { deleteBtn.disabled = false; deleteBtn.textContent = "🗑️"; }
       if (result.error) { els.walletError.textContent = result.error; return; }
       resetWalletForm(els);
       renderWallets(els);
