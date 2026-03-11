@@ -9,45 +9,45 @@
 
 /* ── TOKENS (DARK THEME) ────────────────────────────────────── */
 :root {
-  --bg:             #0d1117;
-  --bg-2:           #0a0f1a;
-  --bg-3:           #111827;
-  --surface:        #161c2d;
-  --surface-2:      #1a2236;
-  --surface-3:      #1e2840;
-  --border:         rgba(255,255,255,0.06);
-  --border-2:       rgba(255,255,255,0.10);
-  --border-hi:      rgba(99,179,237,0.35);
+  --bg:             #0B1220;
+  --bg-2:           #0B1220;
+  --bg-3:           #0F172A;
+  --surface:        #121A2B;
+  --surface-2:      #162238;
+  --surface-3:      #1a2844;
+  --border:         rgba(31,42,68,0.9);
+  --border-2:       #1F2A44;
+  --border-hi:      rgba(16,185,129,0.35);
   --sidebar-w:      228px;
-  --sidebar-bg:     #090d16;
-  --sidebar-border: rgba(255,255,255,0.05);
-  --blue:           #63B3ED;
-  --blue-dim:       rgba(99,179,237,0.14);
-  --blue-glow:      rgba(99,179,237,0.30);
-  --blue-deep:      rgba(99,179,237,0.08);
-  --green:          #34d399;
+  --sidebar-bg:     #090e1a;
+  --sidebar-border: rgba(31,42,68,0.8);
+  --blue:           #10B981;
+  --blue-dim:       rgba(16,185,129,0.14);
+  --blue-glow:      rgba(16,185,129,0.30);
+  --blue-deep:      rgba(16,185,129,0.08);
+  --green:          #34D399;
   --green-dim:      rgba(52,211,153,0.14);
   --green-glow:     rgba(52,211,153,0.25);
-  --red:            #f87171;
+  --red:            #F87171;
   --red-dim:        rgba(248,113,113,0.14);
   --red-glow:       rgba(248,113,113,0.25);
-  --amber:          #fbbf24;
+  --amber:          #FBBF24;
   --amber-dim:      rgba(251,191,36,0.14);
   --purple:         #a78bfa;
   --purple-dim:     rgba(167,139,250,0.14);
   --purple-glow:    rgba(167,139,250,0.25);
-  --cyan:           #22d3ee;
-  --cyan-dim:       rgba(34,211,238,0.12);
-  --text-1:         #e2e8f0;
-  --text-2:         #94a3b8;
-  --text-3:         #64748b;
+  --cyan:           #34D399;
+  --cyan-dim:       rgba(52,211,153,0.12);
+  --text-1:         #E6EDF3;
+  --text-2:         #8B9BB5;
+  --text-3:         #4e5f7a;
   --radius:         14px;
   --radius-sm:      9px;
   --radius-lg:      20px;
   --radius-xl:      26px;
-  --shadow:         0 20px 50px rgba(0,0,0,0.55);
-  --shadow-sm:      0 8px 28px rgba(0,0,0,0.40);
-  --shadow-glow:    0 0 0 1px var(--border-hi), 0 20px 60px -10px var(--blue-glow), 0 4px 20px rgba(0,0,0,0.4);
+  --shadow:         0 20px 50px rgba(0,0,0,0.65);
+  --shadow-sm:      0 8px 28px rgba(0,0,0,0.50);
+  --shadow-glow:    0 0 0 1px rgba(16,185,129,0.35), 0 6px 18px rgba(16,185,129,0.18), 0 20px 60px -10px rgba(16,185,129,0.15);
   --transition:     160ms cubic-bezier(0.4,0,0.2,1);
 }
 
@@ -109,10 +109,10 @@ body { display: flex; overflow: hidden; }
 
 /* ── CARD (Glassmorphism base) ───────────────────────────────── */
 .card {
-  background: var(--surface);
+  background: linear-gradient(145deg, #162238, #0F172A);
   border-radius: var(--radius-lg);
   padding: 20px;
-  border: 1px solid var(--border);
+  border: 1px solid #1F2A44;
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition), box-shadow var(--transition),
               border-color var(--transition), background var(--transition);
@@ -123,7 +123,7 @@ body { display: flex; overflow: hidden; }
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 0% 0%, rgba(99,179,237,0.05) 0%, transparent 65%);
+  background: radial-gradient(ellipse at 0% 0%, rgba(16,185,129,0.05) 0%, transparent 65%);
   pointer-events: none;
   border-radius: inherit;
 }
@@ -153,7 +153,7 @@ body { display: flex; overflow: hidden; }
   top: -80px; left: -80px;
   width: 260px; height: 260px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(99,179,237,0.09) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(16,185,129,0.09) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -184,7 +184,7 @@ body { display: flex; overflow: hidden; }
   user-select: none;
 }
 .nav-item:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
-.nav-item.active { background: rgba(99,179,237,0.13); color: #bfdbfe; }
+.nav-item.active { background: rgba(16,185,129,0.12); color: #6ee7b7; }
 .nav-item.active .nav-icon { color: var(--blue); }
 .nav-icon { display: flex; align-items: center; justify-content: center; width: 20px; flex-shrink: 0; }
 .nav-label { font-size: 0.875rem; font-weight: 500; }
@@ -272,7 +272,7 @@ body[data-theme="light"] .topbar { background: rgba(248,250,252,0.90); }
   position: absolute; right: 0; top: calc(100% + 7px);
   background: var(--surface-2); border: 1px solid var(--border-hi);
   border-radius: var(--radius); padding: 5px; min-width: 158px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 30px rgba(99,179,237,0.08);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 30px rgba(16,185,129,0.08);
   display: none; z-index: 200;
   animation: fadeDown 0.15s ease;
 }
@@ -387,7 +387,7 @@ body[data-theme="light"] .topbar { background: rgba(248,250,252,0.90); }
 .wallet-row::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
 }
-.wallet-row[data-type="bank"]::before   { background: linear-gradient(90deg, var(--blue), #93c5fd); }
+.wallet-row[data-type="bank"]::before   { background: linear-gradient(90deg, #10B981, #6ee7b7); }
 .wallet-row[data-type="cash"]::before   { background: linear-gradient(90deg, var(--amber), #fde68a); }
 .wallet-row[data-type="crypto"]::before { background: linear-gradient(90deg, var(--purple), #c4b5fd); }
 .wallet-row[data-type="other"]::before  { background: linear-gradient(90deg, var(--text-3), var(--text-2)); }
@@ -488,7 +488,7 @@ td.align-right { font-family: 'DM Mono', monospace; font-weight: 500; }
   width: 390px; max-width: calc(100vw - 32px);
   background: var(--surface-2); border: 1px solid var(--border-hi);
   border-radius: var(--radius-xl); padding: 26px; z-index: 310;
-  box-shadow: 0 24px 70px rgba(0,0,0,0.6), 0 0 0 1px var(--border-hi), 0 0 60px rgba(99,179,237,0.12);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.6), 0 0 0 1px var(--border-hi), 0 0 60px rgba(16,185,129,0.10);
   opacity: 0; pointer-events: none;
   transition: opacity 220ms ease, transform 220ms cubic-bezier(0.34,1.56,0.64,1);
 }
@@ -651,9 +651,9 @@ td.align-right { font-family: 'DM Mono', monospace; font-weight: 500; }
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 22px;
   box-shadow:
-    0 0 0 1px rgba(99,179,237,0.10),
+    0 0 0 1px rgba(16,185,129,0.12),
     0 32px 80px rgba(0,0,0,0.65),
-    0 0 60px rgba(99,179,237,0.06);
+    0 0 60px rgba(16,185,129,0.06);
 
   padding: 26px;
   z-index: 410;
@@ -682,7 +682,7 @@ body[data-theme="light"] .tx-edit-modal {
 .tx-modal-icon {
   width: 38px; height: 38px; border-radius: 12px;
   background: var(--blue-dim);
-  border: 1px solid rgba(99,179,237,0.18);
+  border: 1px solid rgba(16,185,129,0.20);
   display: flex; align-items: center; justify-content: center;
   color: var(--blue); flex-shrink: 0;
 }
@@ -737,7 +737,7 @@ body[data-theme="light"] .tx-modal-input { background: rgba(15,23,42,0.04); }
 .tx-modal-input::placeholder { color: var(--text-3); }
 .tx-modal-input:focus {
   border-color: var(--blue);
-  background: rgba(99,179,237,0.05);
+  background: rgba(16,185,129,0.05);
   box-shadow: 0 0 0 3px var(--blue-dim), 0 0 20px var(--blue-glow);
 }
 
@@ -796,9 +796,9 @@ body[data-theme="light"] .tx-modal-input { background: rgba(15,23,42,0.04); }
 }
 .tx-cat-chip:hover { border-color: var(--border-hi); color: var(--text-1); }
 .tx-cat-chip.active {
-  background: var(--blue-dim); border-color: rgba(99,179,237,0.35);
+  background: var(--blue-dim); border-color: rgba(16,185,129,0.35);
   color: var(--blue);
-  box-shadow: 0 0 12px rgba(99,179,237,0.15);
+  box-shadow: 0 0 12px rgba(16,185,129,0.18);
 }
 
 /* Error */
@@ -1040,3 +1040,94 @@ body[data-theme="light"] .tx-toast {
 @media (max-width: 600px) {
   .monthly-summary-grid { grid-template-columns: repeat(2, 1fr); }
 }
+/* ═══════════════════════════════════════════════════════════════
+   EMERALD FINTECH THEME — Interactive glow overrides
+   Primary accent: #10B981  Hover: #059669
+═══════════════════════════════════════════════════════════════ */
+
+/* Buttons — emerald glow on hover */
+.primary-btn:hover,
+.add-record-btn:hover {
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.35), 0 6px 18px rgba(16,185,129,0.18) !important;
+}
+
+/* Ghost / cancel buttons — emerald border highlight */
+.ghost-btn:hover,
+.topbar-ghost-btn:hover,
+.tx-cancel-btn:hover {
+  border-color: rgba(16,185,129,0.35) !important;
+}
+
+/* Wallet card hover — emerald shadow-glow already via var(--shadow-glow) */
+.wallet-row:hover {
+  border-color: rgba(16,185,129,0.35) !important;
+}
+
+/* Input & select focus glow */
+input:focus,
+select:focus {
+  border-color: #10B981 !important;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.14), 0 0 18px rgba(16,185,129,0.18) !important;
+}
+
+/* Sidebar active nav item */
+.nav-item.active {
+  background: rgba(16,185,129,0.12) !important;
+  color: #6ee7b7 !important;
+}
+.nav-item.active .nav-icon { color: #10B981 !important; }
+
+/* db-spinner accent ring */
+.db-spinner { border-top-color: #10B981 !important; }
+
+/* Panel text link */
+.panel-text-link { color: #10B981 !important; }
+
+/* tx-save-btn (edit modal Save Changes) */
+.tx-save-btn {
+  background: #10B981 !important;
+  box-shadow: 0 3px 16px rgba(16,185,129,0.30) !important;
+}
+.tx-save-btn:hover {
+  box-shadow: 0 0 0 1px rgba(16,185,129,0.35), 0 6px 18px rgba(16,185,129,0.18) !important;
+}
+
+/* tx-amount-symbol ₼ icon in edit modal */
+.tx-amount-symbol { color: #10B981 !important; }
+
+/* Category chip active state */
+.tx-cat-chip.active {
+  background: rgba(16,185,129,0.12) !important;
+  border-color: rgba(16,185,129,0.35) !important;
+  color: #34D399 !important;
+  box-shadow: 0 0 12px rgba(16,185,129,0.18) !important;
+}
+
+/* dot-bank accent dot */
+.dot-bank { background: #10B981 !important; box-shadow: 0 0 7px rgba(16,185,129,0.35) !important; }
+
+/* kpi-icon-blue → emerald */
+.kpi-icon-blue {
+  background: rgba(16,185,129,0.14) !important;
+  color: #10B981 !important;
+  box-shadow: 0 0 16px rgba(16,185,129,0.25) !important;
+}
+
+/* Insight banner warning icon colour (amber — keep as is, already correct) */
+
+/* Light theme: keep readable with adjusted emerald tones */
+body[data-theme="light"] .primary-btn:hover,
+body[data-theme="light"] .add-record-btn:hover {
+  box-shadow: 0 0 0 1px rgba(5,150,105,0.35), 0 6px 18px rgba(5,150,105,0.18) !important;
+}
+body[data-theme="light"] input:focus,
+body[data-theme="light"] select:focus {
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 3px rgba(5,150,105,0.12), 0 0 14px rgba(5,150,105,0.12) !important;
+}
+body[data-theme="light"] .nav-item.active {
+  background: rgba(5,150,105,0.10) !important;
+  color: #065f46 !important;
+}
+body[data-theme="light"] .panel-text-link { color: #059669 !important; }
+body[data-theme="light"] .tx-save-btn { background: #059669 !important; }
