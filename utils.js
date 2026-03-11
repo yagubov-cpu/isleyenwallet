@@ -1,81 +1,32 @@
-// Shared utility helpers (formatting, dates, CSV/JSON export, currency)
+// Shared utility helpers (formatting, dates, CSV/JSON export)
 
 export const CURRENCY = "AZN";
 
-// ── Currency config ───────────────────────────────────────────
-const CURRENCY_CONFIG = {
-  AZN: { symbol: "₼", position: "after",  locale: "en-US", rate: 1       },
-  USD: { symbol: "$", position: "before", locale: "en-US", rate: 0.588   },
-  EUR: { symbol: "€", position: "before", locale: "de-DE", rate: 0.541   },
-};
-
 /**
- * Get the currently selected currency code from localStorage / html attr.
- * Falls back to AZN.
- */
-export function getActiveCurrency() {
-  return localStorage.getItem("wallet-currency") || "AZN";
-}
-
-/**
- * Convert a raw AZN value to the active currency and return the numeric result.
- */
-export function convertAmount(aznValue) {
-  const code = getActiveCurrency();
-  const cfg  = CURRENCY_CONFIG[code] || CURRENCY_CONFIG.AZN;
-  return aznValue * cfg.rate;
-}
-
-/**
- * Format a number as the active currency.
- * If `raw` is provided it is treated as AZN and converted first.
+ * Format a number as Azerbaijani Manat.
  *
- * Output example (AZN): "1,250.00 ₼"
- * Output example (USD): "$1,250.00" (Optionally with narrow-space)
+ * Output example: "1,250.00 ₼"
+ *
+ * Why we format manually instead of using Intl currency style:
+ *   style:"currency" + currency:"AZN" renders inconsistently across
+ *   browsers and OS locales — some output "AZN 1,250.00", others "man.",
+ *   few show "₼" at all. Hardcoding the symbol guarantees identical
+ *   output everywhere and eliminates the flicker where the browser
+ *   briefly shows the OS-default currency symbol before JS corrects it.
+ *
+ * Format rules (per requirements):
+ *   • "en-US" locale → comma thousands separator, dot decimal
+ *   • Exactly 2 decimal places always
+ *   • ₼ symbol placed AFTER the number
+ *   • Narrow no-break space (U+202F) between number and symbol
  */
 export function formatCurrency(value) {
-  const code   = getActiveCurrency();
-  const cfg    = CURRENCY_CONFIG[code] || CURRENCY_CONFIG.AZN;
-  const number = Number.isFinite(value) ? value * cfg.rate : 0;
-
-  const formatted = number.toLocaleString(cfg.locale, {
+  const number = Number.isFinite(value) ? value : 0;
+  const formatted = number.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-
-  if (cfg.position === "after") {
-    return formatted + "\u202F" + cfg.symbol;
-  }
-  return cfg.symbol + formatted;
-}
-
-/**
- * Animate a numeric display element from its current value to `target`.
- * Uses requestAnimationFrame for silky smoothness.
- *
- * @param {HTMLElement} el        - Element whose textContent will be updated
- * @param {number}      target    - Final AZN value
- * @param {number}      duration  - Animation duration in ms (default 900)
- */
-export function animateCounter(el, target, duration = 900) {
-  if (!el) return;
-  const start     = performance.now();
-  const startVal  = 0;
-
-  function easeOutExpo(t) {
-    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-  }
-
-  function step(now) {
-    const elapsed  = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const current  = startVal + (target - startVal) * easeOutExpo(progress);
-    el.textContent = formatCurrency(current);
-    if (progress < 1) requestAnimationFrame(step);
-    else el.textContent = formatCurrency(target);
-  }
-
-  requestAnimationFrame(step);
+  return formatted + "\u202F\u20BC"; // e.g. "1,250.00 ₼"
 }
 
 export function parseNumber(value) {
@@ -101,9 +52,9 @@ export function deepClone(value) {
 
 export function downloadFile({ filename, content, mimeType }) {
   const blob = new Blob([content], { type: mimeType });
-  const url  = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href     = url;
+  link.href = url;
   link.download = filename;
   document.body.appendChild(link);
   link.click();
@@ -114,64 +65,20 @@ export function downloadFile({ filename, content, mimeType }) {
 export function toCSV(rows, { includeHeader = true } = {}) {
   if (!rows.length) return "";
   const headers = Object.keys(rows[0]);
-  const escape  = (value) => {
+  const escape = (value) => {
     if (value == null) return "";
     const s = String(value);
-    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    if (/[",\n]/.test(s)) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
     return s;
   };
   const lines = [];
-  if (includeHeader) lines.push(headers.map(escape).join(","));
-  for (const row of rows) lines.push(headers.map((h) => escape(row[h])).join(","));
+  if (includeHeader) {
+    lines.push(headers.map(escape).join(","));
+  }
+  for (const row of rows) {
+    lines.push(headers.map((h) => escape(row[h])).join(","));
+  }
   return lines.join("\n");
-}
-
-/**
- * Generate smart financial insights from analytics data.
- * Returns an array of insight strings.
- */
-export function generateInsights(analytics) {
-  const insights = [];
-  const { byCategory, totalExpenses, totalIncome, net, byMonth } = analytics;
-
-  // Highest spending category
-  const catEntries = Object.entries(byCategory || {}).sort((a, b) => b[1] - a[1]);
-  if (catEntries.length > 0) {
-    const [topCat, topAmt] = catEntries[0];
-    const pct = totalExpenses > 0 ? Math.round((topAmt / totalExpenses) * 100) : 0;
-    insights.push(`Your highest spending category is ${capitalize(topCat)} (${pct}% of expenses).`);
-  }
-
-  // Savings rate
-  if (totalIncome > 0) {
-    const savingsRate = Math.round((net / totalIncome) * 100);
-    if (savingsRate > 0) {
-      insights.push(`You're saving ${savingsRate}% of your income. Keep it up!`);
-    } else if (savingsRate < 0) {
-      insights.push(`You're spending more than you earn. Consider reviewing your expenses.`);
-    }
-  }
-
-  // Month-over-month expense change
-  const monthKeys = Object.keys(byMonth || {}).sort();
-  if (monthKeys.length >= 2) {
-    const prev = byMonth[monthKeys[monthKeys.length - 2]]?.expense || 0;
-    const curr = byMonth[monthKeys[monthKeys.length - 1]]?.expense || 0;
-    if (prev > 0) {
-      const change = Math.round(((curr - prev) / prev) * 100);
-      if (Math.abs(change) >= 5) {
-        insights.push(
-          change > 0
-            ? `Expenses rose ${change}% vs last month.`
-            : `Expenses dropped ${Math.abs(change)}% vs last month. Great progress!`
-        );
-      }
-    }
-  }
-
-  return insights;
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }

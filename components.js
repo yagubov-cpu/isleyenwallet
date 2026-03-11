@@ -17,7 +17,7 @@ import {
   updateWallet,
 } from "./services.js";
 
-import { animateCounter, downloadFile, formatCurrency, generateInsights, toCSV, todayISO } from "./utils.js";
+import { downloadFile, formatCurrency, toCSV, todayISO } from "./utils.js";
 import { initCharts, updateCharts } from "./charts.js";
 
 export async function initApp() {
@@ -59,29 +59,6 @@ export async function initApp() {
   injectDeleteConfirmModal();
   wireEditModal(els);
   wireDeleteConfirmModal(els);
-
-  // Hide full-page loader
-  hideAppLoader();
-
-  // Populate avatar user info from Supabase auth
-  populateAvatarUser();
-
-  // Wire logout
-  document.addEventListener("app-logout", async () => {
-    const { supabase } = await import("./supabase.js");
-    await supabase.auth.signOut();
-    window.location.reload();
-  });
-
-  // Re-render on currency change
-  document.addEventListener("currency-changed", () => {
-    const a = computeAnalytics();
-    renderAnalytics(els, a);
-    updateCharts(a);
-    renderWallets(els);
-    renderTransactions(els);
-    renderRecentTransactions(els);
-  });
 }
 
 function queryElements() {
@@ -229,12 +206,19 @@ function resetWalletForm(els) {
 function wireWalletForm(els) {
   resetWalletForm(els);
   els.walletCancelEdit.addEventListener("click", () => resetWalletForm(els));
-  els.walletForm.addEventListener("submit", (event) => {
+  els.walletForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     els.walletError.textContent = "";
     const id = els.walletId.value || null;
     const payload = { name: els.walletName.value, type: els.walletType.value, startingBalance: els.walletBalance.value };
-    const result = id ? updateWallet(id, payload) : addWallet(payload);
+
+    const submitBtn = els.walletSubmitButton;
+    const origText  = submitBtn ? submitBtn.textContent : "";
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Saving…"; }
+
+    const result = await (id ? updateWallet(id, payload) : addWallet(payload));
+
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = origText; }
     if (result.error) { els.walletError.textContent = result.error; return; }
     resetWalletForm(els);
     renderWallets(els);
@@ -247,7 +231,7 @@ function wireWalletForm(els) {
 }
 
 function wireWalletList(els) {
-  els.walletList.addEventListener("click", (event) => {
+  els.walletList.addEventListener("click", async (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const row = target.closest(".wallet-row");
@@ -270,7 +254,10 @@ function wireWalletList(els) {
       const wallet = findWallet(id);
       if (!wallet) return;
       if (!window.confirm(`Delete wallet "${wallet.name}"?\n\nIf it has transactions, delete those first.`)) return;
-      const result = deleteWallet(id);
+      const deleteBtn = target.closest(".wallet-delete");
+      if (deleteBtn) { deleteBtn.disabled = true; deleteBtn.textContent = "…"; }
+      const result = await deleteWallet(id);
+      if (deleteBtn) { deleteBtn.disabled = false; deleteBtn.textContent = "🗑️"; }
       if (result.error) { els.walletError.textContent = result.error; return; }
       resetWalletForm(els);
       renderWallets(els);
@@ -772,18 +759,9 @@ function fullRefresh(els) {
   updateCharts(analytics);
 }
 
-// ── Analytics ────────────────────────────────────────────────
-let _balanceAnimated = false;
-
+// Analytics
 function renderAnalytics(els, analytics) {
-  // Animated counter on first render only
-  if (!_balanceAnimated) {
-    _balanceAnimated = true;
-    animateCounter(els.totalBalance, analytics.totalBalance, 1100);
-  } else {
-    els.totalBalance.textContent = formatCurrency(analytics.totalBalance);
-  }
-
+  els.totalBalance.textContent   = formatCurrency(analytics.totalBalance);
   els.walletCount.textContent    = String(analytics.walletCount);
   els.avgBalance.textContent     = formatCurrency(analytics.avgBalance);
   els.sumBank.textContent        = formatCurrency(analytics.byType.bank    || 0);
@@ -793,40 +771,6 @@ function renderAnalytics(els, analytics) {
   els.totalIncome.textContent    = formatCurrency(analytics.totalIncome);
   els.totalExpenses.textContent  = formatCurrency(analytics.totalExpenses);
   els.netBalance.textContent     = formatCurrency(analytics.net);
-
-  // Spending progress bar
-  updateSpendingBar(analytics);
-
-  // Smart insights
-  renderInsights(analytics);
-}
-
-function updateSpendingBar(analytics) {
-  const fill  = document.getElementById("spending-bar-fill");
-  const label = document.getElementById("spending-bar-label");
-  if (!fill || !label) return;
-
-  const total    = analytics.totalIncome || 0;
-  const spent    = analytics.totalExpenses || 0;
-  const pct      = total > 0 ? Math.min(Math.round((spent / total) * 100), 100) : 0;
-
-  fill.style.width = pct + "%";
-  fill.style.background = pct > 80
-    ? "linear-gradient(90deg, #f87171, #fbbf24)"
-    : pct > 50
-      ? "linear-gradient(90deg, #fbbf24, #34d399)"
-      : "linear-gradient(90deg, #34d399, #63B3ED)";
-  label.textContent = total > 0 ? `${pct}% of income spent` : "";
-}
-
-function renderInsights(analytics) {
-  const strip = document.getElementById("insights-strip");
-  const text  = document.getElementById("insights-text");
-  if (!strip || !text) return;
-  const insights = generateInsights(analytics);
-  if (!insights.length) { strip.style.display = "none"; return; }
-  strip.style.display = "flex";
-  text.textContent = insights[0];
 }
 
 /**
@@ -848,12 +792,6 @@ function revealCurrencyElements() {
 // ── Loading / error state helpers ────────────────────────────
 
 function showLoadingState(els) {
-  // App loader is already visible from HTML; update message
-  const msg = document.getElementById("loader-msg");
-  if (msg) msg.textContent = "Loading your data…";
-  const bar = document.getElementById("loader-bar");
-  if (bar) bar.style.width = "60%";
-
   const recentEl = document.getElementById("recent-transactions-list");
   if (recentEl) {
     recentEl.innerHTML = `
@@ -876,15 +814,6 @@ function hideLoadingState(els) {
 }
 
 function showDbError(els, error) {
-  // Update the full-page loader to show error state
-  const loader = document.getElementById("app-loader");
-  const msg    = document.getElementById("loader-msg");
-  const bar    = document.getElementById("loader-bar");
-  if (msg) msg.textContent = "⚠️ Could not connect. Check your connection.";
-  if (bar) { bar.style.width = "100%"; bar.style.background = "var(--red)"; }
-  if (loader) loader.classList.add("loader-error");
-  setTimeout(() => { if (loader) loader.classList.add("loader-done"); }, 2500);
-
   const recentEl = document.getElementById("recent-transactions-list");
   if (recentEl) {
     recentEl.innerHTML = `
@@ -899,39 +828,4 @@ function showDbError(els, error) {
     empty.textContent   = "⚠️ Failed to connect to database.";
   }
   console.error("[initApp] Supabase error:", error);
-}
-
-// ── App loader ────────────────────────────────────────────────
-function hideAppLoader() {
-  const loader = document.getElementById("app-loader");
-  const bar    = document.getElementById("loader-bar");
-  if (bar) bar.style.width = "100%";
-  setTimeout(() => {
-    if (loader) loader.classList.add("loader-done");
-  }, 300);
-}
-
-// ── Avatar user info ──────────────────────────────────────────
-async function populateAvatarUser() {
-  try {
-    const { supabase } = await import("./supabase.js");
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const email    = user.email || "";
-    const name     = user.user_metadata?.full_name || user.user_metadata?.name || email.split("@")[0] || "User";
-    const initials = name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() || "?";
-
-    const avatarEl   = document.getElementById("user-avatar");
-    const initialsEl = document.getElementById("avatar-dropdown-initials");
-    const nameEl     = document.getElementById("avatar-dropdown-name");
-    const emailEl    = document.getElementById("avatar-dropdown-email");
-
-    if (avatarEl)   avatarEl.textContent   = initials;
-    if (initialsEl) initialsEl.textContent = initials;
-    if (nameEl)     nameEl.textContent     = name;
-    if (emailEl)    emailEl.textContent    = email;
-  } catch (e) {
-    // Not authenticated or Supabase not reachable — leave defaults
-  }
 }
