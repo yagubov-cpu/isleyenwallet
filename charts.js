@@ -394,14 +394,12 @@ function toNetWorthData(byMonth, totalBalance) {
   const keys = Object.keys(byMonth || {}).sort();
   if (!keys.length) return { labels: [], values: [] };
 
-  const balances = [];
-  let running = totalBalance || 0;
-
-  for (let i = keys.length - 1; i >= 0; i--) {
-    balances.unshift(running);
-    const m = byMonth[keys[i]];
-    running = running - (m.income || 0) + (m.expense || 0);
-  }
+  let cumulative = 0;
+  const balances = keys.map((k) => {
+    const m = byMonth[k];
+    cumulative += (m.income || 0) - (m.expense || 0);
+    return cumulative;
+  });
 
   return { labels: keys, values: balances };
 }
