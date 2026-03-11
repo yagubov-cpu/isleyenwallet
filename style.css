@@ -1040,3 +1040,36 @@ body[data-theme="light"] .tx-toast {
 @media (max-width: 600px) {
   .monthly-summary-grid { grid-template-columns: repeat(2, 1fr); }
 }
+/* ── All Records table: Actions column ──────────────────────── */
+th.tx-actions,
+td.tx-actions {
+  text-align: right;
+}
+
+.tx-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--border-2);
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  margin-left: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+  font-size: 13px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.tx-action-btn:hover {
+  background: var(--surface-2);
+  color: var(--text-1);
+}
+
+.tx-action-btn.delete-record-btn:hover {
+  background: var(--red-dim);
+  color: var(--red);
+}

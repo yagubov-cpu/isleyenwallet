@@ -355,6 +355,10 @@ function renderTransactions(els) {
         <td>${t.category}</td>
         <td class="align-right">${formatCurrency(t.amount)}</td>
         <td>${t.note || ""}</td>
+        <td class="tx-actions">
+          <button class="tx-action-btn edit-record-btn" type="button" title="Edit" data-id="${t.id}">✏️</button>
+          <button class="tx-action-btn delete-record-btn" type="button" title="Delete" data-id="${t.id}">🗑</button>
+        </td>
       </tr>`;
   }).join("");
   els.transactionsEmpty.style.display = "none";
@@ -617,6 +621,27 @@ function wireEditModal(els) {
         const txId = deleteBtn.dataset.txId;
         openDeleteConfirm(txId, els);
         document.getElementById(`tx-drop-${txId}`)?.classList.remove("open");
+      }
+    });
+  }
+
+  // Edit/Delete from All Records table (delegated)
+  const tableBody = document.getElementById("transactions-tbody");
+  if (tableBody) {
+    tableBody.addEventListener("click", (e) => {
+      const editBtn   = e.target.closest(".edit-record-btn");
+      const deleteBtn = e.target.closest(".delete-record-btn");
+
+      if (editBtn) {
+        const txId = editBtn.dataset.id;
+        const tx = listTransactions().find((t) => t.id === txId);
+        if (!tx) return;
+        openEditModal(tx);
+      }
+
+      if (deleteBtn) {
+        const txId = deleteBtn.dataset.id;
+        openDeleteConfirm(txId, els);
       }
     });
   }
