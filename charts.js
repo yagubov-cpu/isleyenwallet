@@ -82,7 +82,7 @@ export function initCharts(analytics) {
         {
           label: "Income",
           data: monthlyData.income,
-          backgroundColor: "rgba(52, 211, 153, 0.88)",
+          backgroundColor: "rgba(8, 136, 89, 0.88)",
           borderRadius: 6,
           borderSkipped: false,
           maxBarThickness: 32,
@@ -226,16 +226,19 @@ export function initCharts(analytics) {
   });
 
   // ── Analytics page charts ────────────────────────────────────
-  const analyticsMonthlyCtx  = document.getElementById("chart-monthly-2");
+  const analyticsMonthlyCtx = document.getElementById("chart-monthly-2");
   const analyticsCategoryCtx = document.getElementById("chart-category-2");
-  const netWorthCtx          = document.getElementById("chart-networth");
-  const savingsRateCtx       = document.getElementById("chart-savings-rate");
+  const netWorthCtx = document.getElementById("chart-networth");
+  const savingsRateCtx = document.getElementById("chart-savings-rate");
 
-  const netWorthData   = toNetWorthData(analytics.byMonth, analytics.totalBalance);
-  const savingsData    = toSavingsRateData(analytics.byMonth);
+  const netWorthData = toNetWorthData(analytics.byMonth, analytics.totalBalance);
+  const savingsData = toSavingsRateData(analytics.byMonth);
 
   // ── Net Worth Trend (line) ──────────────────────────────────
   if (netWorthCtx) {
+    const nwGradient = netWorthCtx.getContext("2d").createLinearGradient(0, 0, 0, 340);
+    nwGradient.addColorStop(0, "rgba(96,165,250,0.35)");
+    nwGradient.addColorStop(1, "rgba(96,165,250,0.03)");
     netWorthChart = new Chart(netWorthCtx, {
       type: "line",
       data: {
@@ -243,38 +246,39 @@ export function initCharts(analytics) {
         datasets: [{
           label: "Net Worth",
           data: netWorthData.values,
-          borderColor: "#63B3ED",
-          backgroundColor: "rgba(99,179,237,0.10)",
+          borderColor: "#60A5FA",
+          backgroundColor: nwGradient,
           fill: true,
-          tension: 0.35,
-          pointBackgroundColor: "#63B3ED",
+          tension: 0.45,
+          pointBackgroundColor: "#93C5FD",
           pointBorderColor: "#0d1117",
           pointBorderWidth: 2,
-          pointRadius: 4,
+          pointRadius: 3,
           pointHoverRadius: 6,
-          borderWidth: 2.5,
+          borderWidth: 2,
         }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
         animation: { duration: 900, easing: "easeInOutQuart" },
         layout: { padding: { top: 8, right: 16, left: 4, bottom: 0 } },
         scales: {
           x: {
-            ticks: { color: "#64748b", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
+            ticks: { color: "rgba(226,232,240,0.7)", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
             grid: { display: false, drawBorder: false },
           },
           y: {
-            ticks: { color: "#64748b", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 }, callback: (v) => formatCurrency(v) },
-            grid: { color: "rgba(99,179,237,0.09)", drawBorder: false, borderDash: [4, 4] },
+            ticks: { color: "rgba(226,232,240,0.7)", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 }, callback: (v) => formatCurrency(v) },
+            grid: { color: "rgba(255,255,255,0.06)", drawBorder: false, borderDash: [4, 4] },
           },
         },
         plugins: {
           legend: { display: false },
           tooltip: {
             backgroundColor: "rgba(13,17,23,0.97)",
-            borderColor: "rgba(99,179,237,0.35)",
+            borderColor: "rgba(96,165,250,0.35)",
             borderWidth: 1, padding: 10,
             titleColor: "#e2e8f0", bodyColor: "#94a3b8",
             callbacks: { label: (ctx) => `Net Worth: ${formatCurrency(ctx.parsed.y)}` },
@@ -294,7 +298,8 @@ export function initCharts(analytics) {
           {
             label: "Income",
             data: monthlyData.income,
-            backgroundColor: "rgba(52, 211, 153, 0.88)",
+            backgroundColor: "#34D399",
+            hoverBackgroundColor: "#10B981",
             borderRadius: 6,
             borderSkipped: false,
             maxBarThickness: 40,
@@ -302,7 +307,8 @@ export function initCharts(analytics) {
           {
             label: "Expenses",
             data: monthlyData.expense,
-            backgroundColor: "rgba(248, 113, 113, 0.90)",
+            backgroundColor: "#F87171",
+            hoverBackgroundColor: "#EF4444",
             borderRadius: 6,
             borderSkipped: false,
             maxBarThickness: 40,
@@ -312,27 +318,34 @@ export function initCharts(analytics) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
         animation: { duration: 900, easing: "easeInOutQuart" },
         layout: { padding: { top: 8, right: 16, left: 4, bottom: 0 } },
         scales: {
           x: {
-            ticks: { color: "#64748b", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
+            ticks: { color: "rgba(226,232,240,0.7)", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
             grid: { display: false, drawBorder: false },
           },
           y: {
-            ticks: { color: "#64748b", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 }, callback: (v) => formatCurrency(v) },
-            grid: { color: "rgba(99,179,237,0.09)", drawBorder: false, borderDash: [4, 4] },
+            ticks: { color: "rgba(226,232,240,0.7)", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 }, callback: (v) => formatCurrency(v) },
+            grid: { color: "rgba(255,255,255,0.06)", drawBorder: false, borderDash: [4, 4] },
           },
         },
         plugins: {
           legend: {
             position: "top", align: "end",
-            labels: { color: "#e2e8f0", usePointStyle: true, boxWidth: 8, padding: 12,
-              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
+            labels: {
+              color: "#e2e8f0", usePointStyle: true, boxWidth: 8, padding: 12,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+              generateLabels: (chart) => chart.data.datasets.map((ds, i) => ({
+                text: ds.label, fillStyle: ds.backgroundColor, strokeStyle: ds.backgroundColor,
+                pointStyle: "circle", hidden: !chart.isDatasetVisible(i), datasetIndex: i,
+              })),
+            },
           },
           tooltip: {
             backgroundColor: "rgba(13,17,23,0.97)",
-            borderColor: "rgba(99,179,237,0.35)",
+            borderColor: "rgba(96,165,250,0.35)",
             borderWidth: 1, padding: 10,
             titleColor: "#e2e8f0", bodyColor: "#94a3b8",
             callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}` },
@@ -352,6 +365,8 @@ export function initCharts(analytics) {
           label: "Spending by category",
           data: categoryData.values,
           backgroundColor: categoryData.colors,
+          borderColor: "rgba(13,17,23,0.8)",
+          borderWidth: 2,
         }],
       },
       options: {
@@ -359,12 +374,14 @@ export function initCharts(analytics) {
         plugins: {
           legend: {
             position: "bottom", align: "center",
-            labels: { color: "#e2e8f0", usePointStyle: true, boxWidth: 8, padding: 16,
-              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
+            labels: {
+              color: "#e2e8f0", usePointStyle: true, boxWidth: 8, padding: 16,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 }
+            },
           },
           tooltip: {
             backgroundColor: "rgba(13,17,23,0.97)",
-            borderColor: "rgba(99,179,237,0.35)",
+            borderColor: "rgba(96,165,250,0.35)",
             borderWidth: 1, padding: 10,
             titleColor: "#e2e8f0", bodyColor: "#94a3b8",
             callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.parsed)}` },
@@ -378,6 +395,9 @@ export function initCharts(analytics) {
 
   // ── Savings Rate (line, %) ──────────────────────────────────
   if (savingsRateCtx) {
+    const srGradient = savingsRateCtx.getContext("2d").createLinearGradient(0, 0, 0, 340);
+    srGradient.addColorStop(0, "rgba(52,211,153,0.35)");
+    srGradient.addColorStop(1, "rgba(52,211,153,0.05)");
     savingsRateChart = new Chart(savingsRateCtx, {
       type: "line",
       data: {
@@ -385,33 +405,34 @@ export function initCharts(analytics) {
         datasets: [{
           label: "Savings Rate",
           data: savingsData.values,
-          borderColor: "#34d399",
-          backgroundColor: "rgba(52,211,153,0.10)",
+          borderColor: "#34D399",
+          backgroundColor: srGradient,
           fill: true,
-          tension: 0.35,
-          pointBackgroundColor: "#34d399",
+          tension: 0.45,
+          pointBackgroundColor: "#34D399",
           pointBorderColor: "#0d1117",
           pointBorderWidth: 2,
-          pointRadius: 4,
+          pointRadius: 3,
           pointHoverRadius: 6,
-          borderWidth: 2.5,
+          borderWidth: 2,
         }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
         animation: { duration: 900, easing: "easeInOutQuart" },
         layout: { padding: { top: 8, right: 16, left: 4, bottom: 0 } },
         scales: {
           x: {
-            ticks: { color: "#64748b", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
+            ticks: { color: "rgba(226,232,240,0.7)", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 } },
             grid: { display: false, drawBorder: false },
           },
           y: {
             min: -100,
             max: 100,
-            ticks: { color: "#64748b", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 }, callback: (v) => v + "%" },
-            grid: { color: "rgba(99,179,237,0.09)", drawBorder: false, borderDash: [4, 4] },
+            ticks: { color: "rgba(226,232,240,0.7)", padding: 6, font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 }, callback: (v) => v + "%" },
+            grid: { color: "rgba(255,255,255,0.06)", drawBorder: false, borderDash: [4, 4] },
           },
         },
         plugins: {
@@ -458,7 +479,7 @@ export function updateCharts(analytics) {
   }
 
   const netWorthData = toNetWorthData(analytics.byMonth, analytics.totalBalance);
-  const savingsData  = toSavingsRateData(analytics.byMonth);
+  const savingsData = toSavingsRateData(analytics.byMonth);
 
   if (netWorthChart) {
     netWorthChart.data.labels = netWorthData.labels;
@@ -517,7 +538,7 @@ function toNetWorthData(byMonth, totalBalance) {
 
   // Compute cumulative net per month in chronological order
   const monthlyNet = keys.map((k) => (byMonth[k].income || 0) - (byMonth[k].expense || 0));
-  const totalNet   = monthlyNet.reduce((s, v) => s + v, 0);
+  const totalNet = monthlyNet.reduce((s, v) => s + v, 0);
 
   // The balance before the first recorded month
   const baseBalance = totalBalance - totalNet;
@@ -546,12 +567,12 @@ function toSavingsRateData(byMonth) {
 
 function generateColors(count) {
   const baseColors = [
-    "#63B3ED",
-    "#34d399",
-    "#fbbf24",
-    "#f87171",
-    "#a78bfa",
-    "#22d3ee",
+    "#60A5FA",
+    "#34D399",
+    "#FBBF24",
+    "#A78BFA",
+    "#22D3EE",
+    "#F87171",
   ];
   if (count <= baseColors.length) return baseColors.slice(0, count);
   const colors = [];
