@@ -1007,7 +1007,15 @@ body[data-theme="light"] .tx-toast {
   opacity: 1;
 }
 
-/* ── Monthly Summary card cells ─────────────────────────────── */
+/* ── Monthly Summary card ────────────────────────────────────── */
+.monthly-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  overflow: hidden;
+}
 .monthly-summary-cell {
   background: var(--surface);
   padding: 16px 20px;
@@ -1030,7 +1038,5 @@ body[data-theme="light"] .tx-toast {
   letter-spacing: -0.01em;
 }
 @media (max-width: 600px) {
-  #monthly-summary-card [style*="repeat(4"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+  .monthly-summary-grid { grid-template-columns: repeat(2, 1fr); }
 }

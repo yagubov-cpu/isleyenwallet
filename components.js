@@ -789,30 +789,29 @@ function renderInsightBanner(analytics) {
 }
 
 function renderMonthlySummary(analytics) {
-  const msIncome   = document.getElementById("ms-income");
-  const msExpenses = document.getElementById("ms-expenses");
-  const msSaved    = document.getElementById("ms-saved");
-  const msRate     = document.getElementById("ms-rate");
-  const msLabel    = document.getElementById("monthly-summary-label");
+  const incomeEl = document.getElementById("summary-income");
+  const expenseEl = document.getElementById("summary-expense");
+  const savedEl = document.getElementById("summary-saved");
+  const rateEl = document.getElementById("summary-rate");
+  const labelEl = document.getElementById("monthly-summary-label");
 
-  if (!msIncome) return;
+  if (!incomeEl) return;
 
   const { totalIncome, totalExpenses, net } = analytics;
-  const savingsRate = totalIncome > 0
-    ? Math.round((net / totalIncome) * 100)
-    : 0;
+  const rate = totalIncome > 0 ? Math.round((net / totalIncome) * 100) : 0;
 
   const now = new Date();
-  const monthLabel = now.toLocaleString("en-US", { month: "long", year: "numeric" });
-  if (msLabel) msLabel.textContent = monthLabel;
+  if (labelEl) {
+    labelEl.textContent = now.toLocaleString("en-US", { month: "long", year: "numeric" });
+  }
 
-  msIncome.textContent   = formatCurrency(totalIncome);
-  msExpenses.textContent = formatCurrency(totalExpenses);
-  msSaved.textContent    = formatCurrency(net);
-  msRate.textContent     = savingsRate + "%";
+  incomeEl.textContent  = formatCurrency(totalIncome);
+  expenseEl.textContent = formatCurrency(totalExpenses);
+  savedEl.textContent   = formatCurrency(net);
+  rateEl.textContent    = rate + "%";
 
-  msSaved.className = "monthly-summary-cell-value " + (net >= 0 ? "kpi-positive" : "kpi-negative");
-  msRate.className  = "monthly-summary-cell-value " + (savingsRate >= 0 ? "kpi-positive" : "kpi-negative");
+  savedEl.className = "monthly-summary-cell-value " + (net >= 0 ? "kpi-positive" : "kpi-negative");
+  rateEl.className  = "monthly-summary-cell-value " + (rate >= 0 ? "kpi-positive" : "kpi-negative");
 }
 
 /**
