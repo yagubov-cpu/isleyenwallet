@@ -5,7 +5,8 @@ import { formatCurrency } from "./utils.js";
 let categoryChart;
 let monthlyChart;
 let walletChart;
-let netWorthChart;
+let analyticsMonthlyChart;
+let analyticsCategoryChart;
 
 export function initCharts(analytics) {
   const categoryCtx = document.getElementById("chart-category");
@@ -19,90 +20,6 @@ export function initCharts(analytics) {
   const categoryData = toCategoryData(analytics.byCategory);
   const monthlyData = toMonthlyData(analytics.byMonth);
   const walletData = toWalletData(analytics.byWalletSpending);
-  const netWorthData = toNetWorthData(analytics.byMonth, analytics.totalBalance);
-
-  // ── Net Worth Trend ──────────────────────────────────────────
-  const netWorthCtx = document.getElementById("chart-net-worth");
-  if (netWorthCtx) {
-    netWorthChart = new Chart(netWorthCtx, {
-      type: "line",
-      data: {
-        labels: netWorthData.labels,
-        datasets: [{
-          label: "Net Worth",
-          data: netWorthData.values,
-          borderColor: "#63B3ED",
-          borderWidth: 2.5,
-          pointBackgroundColor: "#63B3ED",
-          pointBorderColor: "rgba(13,17,23,0.9)",
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          tension: 0.45,
-          fill: true,
-          backgroundColor: function (context) {
-            const chart = context.chart;
-            const { ctx, chartArea } = chart;
-            if (!chartArea) return "transparent";
-            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-            gradient.addColorStop(0,   "rgba(99,179,237,0.28)");
-            gradient.addColorStop(0.6, "rgba(99,179,237,0.07)");
-            gradient.addColorStop(1,   "rgba(99,179,237,0.00)");
-            return gradient;
-          },
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 1200, easing: "easeInOutQuart" },
-        layout: { padding: { top: 8, right: 16, left: 4, bottom: 0 } },
-        scales: {
-          x: {
-            ticks: {
-              color: "#64748b",
-              padding: 6,
-              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
-            },
-            grid: { display: false, drawBorder: false },
-          },
-          y: {
-            ticks: {
-              color: "#64748b",
-              padding: 6,
-              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
-              callback: (value) => formatCurrency(value),
-            },
-            grid: { color: "rgba(99,179,237,0.09)", drawBorder: false, borderDash: [4, 4] },
-          },
-        },
-        plugins: {
-          legend: {
-            position: "top",
-            align: "end",
-            labels: {
-              color: "#e2e8f0",
-              usePointStyle: true,
-              boxWidth: 8,
-              padding: 12,
-              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
-            },
-          },
-          tooltip: {
-            backgroundColor: "rgba(13,17,23,0.97)",
-            borderColor: "rgba(99,179,237,0.35)",
-            borderWidth: 1,
-            padding: 10,
-            titleColor: "#e2e8f0",
-            bodyColor: "#94a3b8",
-            callbacks: {
-              label: (ctx) => `Net Worth: ${formatCurrency(ctx.parsed.y)}`,
-            },
-          },
-        },
-      },
-    });
-  }
 
   categoryChart = new Chart(categoryCtx, {
     type: "pie",
@@ -307,6 +224,126 @@ export function initCharts(analytics) {
       maintainAspectRatio: false,
     },
   });
+
+  // ── Analytics page charts ────────────────────────────────────
+  const analyticsMonthlyCtx  = document.getElementById("chart-monthly-2");
+  const analyticsCategoryCtx = document.getElementById("chart-category-2");
+
+  if (analyticsMonthlyCtx) {
+    analyticsMonthlyChart = new Chart(analyticsMonthlyCtx, {
+      type: "bar",
+      data: {
+        labels: monthlyData.labels,
+        datasets: [
+          {
+            label: "Income",
+            data: monthlyData.income,
+            backgroundColor: "rgba(52, 211, 153, 0.88)",
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 40,
+          },
+          {
+            label: "Expenses",
+            data: monthlyData.expense,
+            backgroundColor: "rgba(248, 113, 113, 0.90)",
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 40,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 900, easing: "easeInOutQuart" },
+        layout: { padding: { top: 8, right: 16, left: 4, bottom: 0 } },
+        scales: {
+          x: {
+            ticks: {
+              color: "#64748b",
+              padding: 6,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+            },
+            grid: { display: false, drawBorder: false },
+          },
+          y: {
+            ticks: {
+              color: "#64748b",
+              padding: 6,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+              callback: (value) => formatCurrency(value),
+            },
+            grid: { color: "rgba(99,179,237,0.09)", drawBorder: false, borderDash: [4, 4] },
+          },
+        },
+        plugins: {
+          legend: {
+            position: "top",
+            align: "end",
+            labels: {
+              color: "#e2e8f0",
+              usePointStyle: true,
+              boxWidth: 8,
+              padding: 12,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+            },
+          },
+          tooltip: {
+            backgroundColor: "rgba(13,17,23,0.97)",
+            borderColor: "rgba(99,179,237,0.35)",
+            borderWidth: 1,
+            padding: 10,
+            titleColor: "#e2e8f0",
+            bodyColor: "#94a3b8",
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  if (analyticsCategoryCtx) {
+    analyticsCategoryChart = new Chart(analyticsCategoryCtx, {
+      type: "pie",
+      data: {
+        labels: categoryData.labels,
+        datasets: [{
+          label: "Spending by category",
+          data: categoryData.values,
+          backgroundColor: categoryData.colors,
+        }],
+      },
+      options: {
+        plugins: {
+          legend: {
+            position: "bottom",
+            align: "center",
+            labels: {
+              color: "#e2e8f0",
+              usePointStyle: true,
+              boxWidth: 8,
+              padding: 16,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+            },
+          },
+          tooltip: {
+            backgroundColor: "rgba(13,17,23,0.97)",
+            borderColor: "rgba(99,179,237,0.35)",
+            borderWidth: 1,
+            padding: 10,
+            titleColor: "#e2e8f0",
+            bodyColor: "#94a3b8",
+            callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.parsed)}` },
+          },
+        },
+        layout: { padding: { top: 4, right: 12, bottom: 4, left: 12 } },
+        maintainAspectRatio: false,
+      },
+    });
+  }
 }
 
 export function updateCharts(analytics) {
@@ -315,13 +352,6 @@ export function updateCharts(analytics) {
   const categoryData = toCategoryData(analytics.byCategory);
   const monthlyData = toMonthlyData(analytics.byMonth);
   const walletData = toWalletData(analytics.byWalletSpending);
-  const netWorthData = toNetWorthData(analytics.byMonth, analytics.totalBalance);
-
-  if (netWorthChart) {
-    netWorthChart.data.labels = netWorthData.labels;
-    netWorthChart.data.datasets[0].data = netWorthData.values;
-    netWorthChart.update();
-  }
 
   if (categoryChart) {
     categoryChart.data.labels = categoryData.labels;
@@ -342,6 +372,20 @@ export function updateCharts(analytics) {
     walletChart.data.datasets[0].data = walletData.values;
     walletChart.data.datasets[0].backgroundColor = walletData.colors;
     walletChart.update();
+  }
+
+  if (analyticsMonthlyChart) {
+    analyticsMonthlyChart.data.labels = monthlyData.labels;
+    analyticsMonthlyChart.data.datasets[0].data = monthlyData.income;
+    analyticsMonthlyChart.data.datasets[1].data = monthlyData.expense;
+    analyticsMonthlyChart.update();
+  }
+
+  if (analyticsCategoryChart) {
+    analyticsCategoryChart.data.labels = categoryData.labels;
+    analyticsCategoryChart.data.datasets[0].data = categoryData.values;
+    analyticsCategoryChart.data.datasets[0].backgroundColor = categoryData.colors;
+    analyticsCategoryChart.update();
   }
 }
 
@@ -383,23 +427,4 @@ function generateColors(count) {
     colors.push(baseColors[i % baseColors.length]);
   }
   return colors;
-}
-
-/**
- * Reconstruct month-end balances by walking backwards from the current
- * totalBalance, reversing each month's net flow (income − expense).
- * The result reads oldest → newest on the X-axis.
- */
-function toNetWorthData(byMonth, totalBalance) {
-  const keys = Object.keys(byMonth || {}).sort();
-  if (!keys.length) return { labels: [], values: [] };
-
-  let cumulative = 0;
-  const balances = keys.map((k) => {
-    const m = byMonth[k];
-    cumulative += (m.income || 0) - (m.expense || 0);
-    return cumulative;
-  });
-
-  return { labels: keys, values: balances };
 }

@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Wallet — Personal Finance Dashboard</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .analytics-grid--full { grid-column: 1 / -1; }
+    .chart-wrap-xl { height: 340px !important; }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   
@@ -140,16 +144,6 @@
         <!-- Main grid -->
         <div class="dashboard-grid">
           <div class="dash-main">
-            <!-- Net Worth Trend chart -->
-            <div class="card panel">
-              <div class="panel-header">
-                <div class="panel-title-group">
-                  <h3 class="panel-title">Net Worth Trend</h3>
-                  <span class="panel-sub">Estimated balance over time</span>
-                </div>
-              </div>
-              <div class="chart-wrap-tall"><canvas id="chart-net-worth"></canvas></div>
-            </div>
             <!-- Cash flow chart -->
             <div class="card panel">
               <div class="panel-header">
@@ -394,9 +388,14 @@
           </div>
         </div>
         <div class="analytics-grid">
-          <div class="card panel">
-            <div class="panel-header"><h3 class="panel-title">Monthly Cash Flow</h3></div>
-            <div class="chart-wrap-tall"><canvas id="chart-monthly-2"></canvas></div>
+          <div class="card panel analytics-grid--full">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h3 class="panel-title">Monthly Cash Flow Trend</h3>
+                <span class="panel-sub">Income vs expenses by month</span>
+              </div>
+            </div>
+            <div class="chart-wrap-tall chart-wrap-xl"><canvas id="chart-monthly-2"></canvas></div>
           </div>
           <div class="card panel">
             <div class="panel-header"><h3 class="panel-title">Spending by Category</h3></div>
