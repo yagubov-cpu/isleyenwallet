@@ -611,4 +611,12 @@
       });
 
       // Logout handled by module code in components.js via event
-      docume
+      document.getElementById('avatar-logout')?.addEventListener('click', () => {
+        avatarDrop?.classList.remove('open');
+        document.dispatchEvent(new CustomEvent('app-logout'));
+      });
+
+    })();
+  </script>
+</body>
+</html>
