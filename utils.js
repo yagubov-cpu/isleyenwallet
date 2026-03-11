@@ -5,16 +5,20 @@ export const CURRENCY = "AZN";
 /**
  * Format a number as Azerbaijani Manat.
  *
- * Output:  "1,250.00 ₼"
- *   • Comma  → thousands separator   (1,250)
- *   • Dot    → decimal separator     (.00)
- *   • ₼      → symbol after the amount, separated by a thin non-breaking space (U+202F)
+ * Output example: "1,250.00 ₼"
  *
- * We use "en-US" locale explicitly (not the system locale) so the
- * comma/dot format is always consistent regardless of the user's OS
- * language settings.  Then we append the ₼ symbol manually instead of
- * relying on Intl's AZN rendering, which varies across browsers/OS versions
- * (some output "AZN", some "man.", few show "₼" correctly).
+ * Why we format manually instead of using Intl currency style:
+ *   style:"currency" + currency:"AZN" renders inconsistently across
+ *   browsers and OS locales — some output "AZN 1,250.00", others "man.",
+ *   few show "₼" at all. Hardcoding the symbol guarantees identical
+ *   output everywhere and eliminates the flicker where the browser
+ *   briefly shows the OS-default currency symbol before JS corrects it.
+ *
+ * Format rules (per requirements):
+ *   • "en-US" locale → comma thousands separator, dot decimal
+ *   • Exactly 2 decimal places always
+ *   • ₼ symbol placed AFTER the number
+ *   • Narrow no-break space (U+202F) between number and symbol
  */
 export function formatCurrency(value) {
   const number = Number.isFinite(value) ? value : 0;
@@ -22,8 +26,7 @@ export function formatCurrency(value) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  // U+202F = NARROW NO-BREAK SPACE — standard fintech thin-space before/after currency symbol
-  return formatted + "\u202F\u20BC";
+  return formatted + "\u202F\u20BC"; // e.g. "1,250.00 ₼"
 }
 
 export function parseNumber(value) {
@@ -41,7 +44,6 @@ export function monthKeyFromISO(dateISO) {
 }
 
 export function deepClone(value) {
-  // Use native structuredClone when available; fall back to JSON round-trip.
   if (typeof structuredClone === "function") {
     return structuredClone(value);
   }

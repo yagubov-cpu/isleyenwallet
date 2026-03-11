@@ -50,6 +50,7 @@ export async function initApp() {
 
   const analytics = computeAnalytics();
   renderAnalytics(els, analytics);
+  revealCurrencyElements(); // remove loading opacity now that correct ₼ values are written
   initCharts(analytics);
 
   // Inject edit modal + toast into DOM
@@ -760,6 +761,22 @@ function renderAnalytics(els, analytics) {
   els.totalIncome.textContent    = formatCurrency(analytics.totalIncome);
   els.totalExpenses.textContent  = formatCurrency(analytics.totalExpenses);
   els.netBalance.textContent     = formatCurrency(analytics.net);
+}
+
+/**
+ * Remove the .js-currency loading class from all currency display elements.
+ *
+ * Called once — after the very first renderAnalytics() in initApp().
+ * At that point every element already contains the correct ₼ value written
+ * by formatCurrency(), so making them visible is safe with no flicker.
+ *
+ * Subsequent renderAnalytics() calls (after wallet/transaction changes) do
+ * not need this — the elements are already visible by then.
+ */
+function revealCurrencyElements() {
+  document.querySelectorAll(".js-currency").forEach((el) => {
+    el.classList.add("js-currency--ready");
+  });
 }
 
 // ── Loading / error state helpers ────────────────────────────

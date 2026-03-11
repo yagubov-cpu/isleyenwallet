@@ -987,3 +987,22 @@ body[data-theme="light"] .tx-toast {
   margin-top: 4px;
   font-family: 'DM Mono', monospace;
 }
+
+
+/* ── Currency flicker prevention ─────────────────────────────────────────────
+   Elements that display currency values are given the .js-currency class in
+   the HTML. On page load they show a neutral "—" placeholder with reduced
+   opacity so the user never sees a wrong currency symbol or a flash of the
+   hardcoded placeholder before JavaScript has rendered the real value.
+
+   components.js calls revealCurrencyElements() after renderAnalytics() writes
+   the correct ₼ values, which removes this class and fades the values in.     */
+
+.js-currency {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.js-currency.js-currency--ready {
+  opacity: 1;
+}
