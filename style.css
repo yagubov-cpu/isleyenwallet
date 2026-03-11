@@ -367,9 +367,9 @@ body[data-theme="light"] .topbar { background: rgba(248,250,252,0.90); }
 .tx-dot-income  { background: var(--green-dim); color: var(--green); }
 .tx-dot-expense { background: var(--red-dim);   color: var(--red); }
 .recent-tx-body { flex: 1; min-width: 0; }
-.recent-tx-cat  { font-size: 15px; font-weight: 600; line-height: 1.3; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.recent-tx-date { font-size: 13px; font-weight: 500; color: #8B9BB5; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.recent-tx-amount { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; white-space: nowrap; }
+.recent-tx-cat { font-size: 17px; font-weight: 600; line-height: 1.3; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recent-tx-date { font-size: 14px; font-weight: 500; color: #8B9BB5; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recent-tx-amount { font-family: 'DM Mono', monospace; font-size: 17px; font-weight: 600; letter-spacing: 0.3px; white-space: nowrap; }
 .amt-income  { color: var(--green); }
 .amt-expense { color: var(--red); }
 .empty-sm { padding: 24px 8px; font-size: 0.82rem; color: var(--text-3); text-align: center; }
