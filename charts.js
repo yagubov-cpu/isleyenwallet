@@ -5,6 +5,7 @@ import { formatCurrency } from "./utils.js";
 let categoryChart;
 let monthlyChart;
 let walletChart;
+let netWorthChart;
 
 export function initCharts(analytics) {
   const categoryCtx = document.getElementById("chart-category");
@@ -18,6 +19,90 @@ export function initCharts(analytics) {
   const categoryData = toCategoryData(analytics.byCategory);
   const monthlyData = toMonthlyData(analytics.byMonth);
   const walletData = toWalletData(analytics.byWalletSpending);
+  const netWorthData = toNetWorthData(analytics.byMonth, analytics.totalBalance);
+
+  // ── Net Worth Trend ──────────────────────────────────────────
+  const netWorthCtx = document.getElementById("chart-net-worth");
+  if (netWorthCtx) {
+    netWorthChart = new Chart(netWorthCtx, {
+      type: "line",
+      data: {
+        labels: netWorthData.labels,
+        datasets: [{
+          label: "Net Worth",
+          data: netWorthData.values,
+          borderColor: "#63B3ED",
+          borderWidth: 2.5,
+          pointBackgroundColor: "#63B3ED",
+          pointBorderColor: "rgba(13,17,23,0.9)",
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.45,
+          fill: true,
+          backgroundColor: function (context) {
+            const chart = context.chart;
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return "transparent";
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            gradient.addColorStop(0,   "rgba(99,179,237,0.28)");
+            gradient.addColorStop(0.6, "rgba(99,179,237,0.07)");
+            gradient.addColorStop(1,   "rgba(99,179,237,0.00)");
+            return gradient;
+          },
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 1200, easing: "easeInOutQuart" },
+        layout: { padding: { top: 8, right: 16, left: 4, bottom: 0 } },
+        scales: {
+          x: {
+            ticks: {
+              color: "#64748b",
+              padding: 6,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+            },
+            grid: { display: false, drawBorder: false },
+          },
+          y: {
+            ticks: {
+              color: "#64748b",
+              padding: 6,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+              callback: (value) => formatCurrency(value),
+            },
+            grid: { color: "rgba(99,179,237,0.09)", drawBorder: false, borderDash: [4, 4] },
+          },
+        },
+        plugins: {
+          legend: {
+            position: "top",
+            align: "end",
+            labels: {
+              color: "#e2e8f0",
+              usePointStyle: true,
+              boxWidth: 8,
+              padding: 12,
+              font: { family: "DM Sans, system-ui, -apple-system, sans-serif", size: 11 },
+            },
+          },
+          tooltip: {
+            backgroundColor: "rgba(13,17,23,0.97)",
+            borderColor: "rgba(99,179,237,0.35)",
+            borderWidth: 1,
+            padding: 10,
+            titleColor: "#e2e8f0",
+            bodyColor: "#94a3b8",
+            callbacks: {
+              label: (ctx) => `Net Worth: ${formatCurrency(ctx.parsed.y)}`,
+            },
+          },
+        },
+      },
+    });
+  }
 
   categoryChart = new Chart(categoryCtx, {
     type: "pie",
@@ -230,6 +315,13 @@ export function updateCharts(analytics) {
   const categoryData = toCategoryData(analytics.byCategory);
   const monthlyData = toMonthlyData(analytics.byMonth);
   const walletData = toWalletData(analytics.byWalletSpending);
+  const netWorthData = toNetWorthData(analytics.byMonth, analytics.totalBalance);
+
+  if (netWorthChart) {
+    netWorthChart.data.labels = netWorthData.labels;
+    netWorthChart.data.datasets[0].data = netWorthData.values;
+    netWorthChart.update();
+  }
 
   if (categoryChart) {
     categoryChart.data.labels = categoryData.labels;
@@ -293,3 +385,23 @@ function generateColors(count) {
   return colors;
 }
 
+/**
+ * Reconstruct month-end balances by walking backwards from the current
+ * totalBalance, reversing each month's net flow (income − expense).
+ * The result reads oldest → newest on the X-axis.
+ */
+function toNetWorthData(byMonth, totalBalance) {
+  const keys = Object.keys(byMonth || {}).sort();
+  if (!keys.length) return { labels: [], values: [] };
+
+  const balances = [];
+  let running = totalBalance || 0;
+
+  for (let i = keys.length - 1; i >= 0; i--) {
+    balances.unshift(running);
+    const m = byMonth[keys[i]];
+    running = running - (m.income || 0) + (m.expense || 0);
+  }
+
+  return { labels: keys, values: balances };
+}
