@@ -141,87 +141,21 @@
           </div>
         </div>
 
-        <!-- Main grid -->
-        <div class="dashboard-grid">
-          <div class="dash-main">
-            <!-- Cash flow chart -->
-            <div class="card panel">
-              <div class="panel-header">
-                <div class="panel-title-group">
-                  <h3 class="panel-title">Cash Flow</h3>
-                  <span class="panel-sub">Monthly income vs expenses</span>
-                </div>
-              </div>
-              <div class="chart-wrap-tall"><canvas id="chart-monthly"></canvas></div>
-            </div>
-            <!-- Bottom charts -->
-            <div class="two-col-charts">
-              <div class="card panel">
-                <div class="panel-header">
-                  <div class="panel-title-group">
-                    <h3 class="panel-title">Spending Structure</h3>
-                    <span class="panel-sub">By category</span>
-                  </div>
-                </div>
-                <div class="chart-wrap-sq"><canvas id="chart-category"></canvas></div>
-              </div>
-              <div class="card panel">
-                <div class="panel-header">
-                  <div class="panel-title-group">
-                    <h3 class="panel-title">Wallet Split</h3>
-                    <span class="panel-sub">Spending per account</span>
-                  </div>
-                </div>
-                <div class="chart-wrap-sq"><canvas id="chart-wallets"></canvas></div>
-              </div>
-            </div>
+        <!-- Hidden elements required by JS analytics rendering -->
+        <span style="display:none" id="sum-bank"></span>
+        <span style="display:none" id="sum-cash"></span>
+        <span style="display:none" id="sum-crypto"></span>
+        <span style="display:none" id="sum-other"></span>
+        <span style="display:none" id="avg-balance"></span>
+
+        <!-- Recent Records -->
+        <div class="card panel" style="margin-top: 24px;">
+          <div class="panel-header">
+            <h3 class="panel-title">Recent Records</h3>
+            <button class="panel-text-link" data-goto="records">View all →</button>
           </div>
-
-          <!-- Right sidebar -->
-          <div class="dash-side">
-            <!-- Balance by type -->
-            <div class="card panel">
-              <div class="panel-header">
-                <h3 class="panel-title">By Account Type</h3>
-              </div>
-              <div class="type-list">
-                <div class="type-row">
-                  <span class="type-dot dot-bank"></span>
-                  <span class="type-name">Bank</span>
-                  <span class="type-val js-currency" id="sum-bank">—</span>
-                </div>
-                <div class="type-row">
-                  <span class="type-dot dot-cash"></span>
-                  <span class="type-name">Cash</span>
-                  <span class="type-val js-currency" id="sum-cash">—</span>
-                </div>
-                <div class="type-row">
-                  <span class="type-dot dot-crypto"></span>
-                  <span class="type-name">Crypto</span>
-                  <span class="type-val js-currency" id="sum-crypto">—</span>
-                </div>
-                <div class="type-row">
-                  <span class="type-dot dot-other"></span>
-                  <span class="type-name">Other</span>
-                  <span class="type-val js-currency" id="sum-other">—</span>
-                </div>
-              </div>
-              <div class="avg-strip">
-                <span class="avg-label">Avg per wallet</span>
-                <span class="avg-val js-currency" id="avg-balance">—</span>
-              </div>
-            </div>
-
-            <!-- Recent records -->
-            <div class="card panel flex-grow-panel">
-              <div class="panel-header">
-                <h3 class="panel-title">Recent Records</h3>
-                <button class="panel-text-link" data-goto="records">View all →</button>
-              </div>
-              <div id="recent-transactions-list" class="recent-tx-list">
-                <div class="empty-sm">No records yet</div>
-              </div>
-            </div>
+          <div id="recent-transactions-list" class="recent-tx-list">
+            <div class="empty-sm">No records yet</div>
           </div>
         </div>
       </div>
