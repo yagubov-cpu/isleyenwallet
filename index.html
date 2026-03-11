@@ -154,6 +154,34 @@
           <span id="insight-banner-text"></span>
         </div>
 
+        <!-- Monthly Summary -->
+        <div class="card panel" id="monthly-summary-card" style="margin-top: 20px;">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <h3 class="panel-title">Monthly Summary</h3>
+              <span class="panel-sub" id="monthly-summary-label"></span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border-radius: 0 0 var(--radius-lg) var(--radius-lg); overflow: hidden;">
+            <div class="monthly-summary-cell">
+              <span class="monthly-summary-cell-label">Income</span>
+              <span class="monthly-summary-cell-value kpi-positive" id="ms-income">—</span>
+            </div>
+            <div class="monthly-summary-cell">
+              <span class="monthly-summary-cell-label">Expenses</span>
+              <span class="monthly-summary-cell-value kpi-negative" id="ms-expenses">—</span>
+            </div>
+            <div class="monthly-summary-cell">
+              <span class="monthly-summary-cell-label">Saved</span>
+              <span class="monthly-summary-cell-value" id="ms-saved">—</span>
+            </div>
+            <div class="monthly-summary-cell">
+              <span class="monthly-summary-cell-label">Savings Rate</span>
+              <span class="monthly-summary-cell-value" id="ms-rate">—</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Recent Records -->
         <div class="card panel" style="margin-top: 24px;">
           <div class="panel-header">

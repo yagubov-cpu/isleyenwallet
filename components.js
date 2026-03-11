@@ -772,6 +772,7 @@ function renderAnalytics(els, analytics) {
   els.totalExpenses.textContent  = formatCurrency(analytics.totalExpenses);
   els.netBalance.textContent     = formatCurrency(analytics.net);
   renderInsightBanner(analytics);
+  renderMonthlySummary(analytics);
 }
 
 function renderInsightBanner(analytics) {
@@ -785,6 +786,33 @@ function renderInsightBanner(analytics) {
   }
   textEl.textContent = insights[0];
   banner.style.display = "flex";
+}
+
+function renderMonthlySummary(analytics) {
+  const msIncome   = document.getElementById("ms-income");
+  const msExpenses = document.getElementById("ms-expenses");
+  const msSaved    = document.getElementById("ms-saved");
+  const msRate     = document.getElementById("ms-rate");
+  const msLabel    = document.getElementById("monthly-summary-label");
+
+  if (!msIncome) return;
+
+  const { totalIncome, totalExpenses, net } = analytics;
+  const savingsRate = totalIncome > 0
+    ? Math.round((net / totalIncome) * 100)
+    : 0;
+
+  const now = new Date();
+  const monthLabel = now.toLocaleString("en-US", { month: "long", year: "numeric" });
+  if (msLabel) msLabel.textContent = monthLabel;
+
+  msIncome.textContent   = formatCurrency(totalIncome);
+  msExpenses.textContent = formatCurrency(totalExpenses);
+  msSaved.textContent    = formatCurrency(net);
+  msRate.textContent     = savingsRate + "%";
+
+  msSaved.className = "monthly-summary-cell-value " + (net >= 0 ? "kpi-positive" : "kpi-negative");
+  msRate.className  = "monthly-summary-cell-value " + (savingsRate >= 0 ? "kpi-positive" : "kpi-negative");
 }
 
 /**
