@@ -89,42 +89,42 @@ export function toCSV(rows, { includeHeader = true } = {}) {
  */
 export function generateInsights(analytics) {
   const insights = [];
-  const { byCategory, totalExpenses, totalIncome, net, byMonth } = analytics;
+  const { byCategory, totalExpenses, totalIncome, net, walletCount } = analytics;
 
-  // Highest spending category
+  // 1. Highest spending category
   const catEntries = Object.entries(byCategory || {}).sort((a, b) => b[1] - a[1]);
   if (catEntries.length > 0) {
     const [topCat, topAmt] = catEntries[0];
-    const pct = totalExpenses > 0 ? Math.round((topAmt / totalExpenses) * 100) : 0;
     const label = topCat.charAt(0).toUpperCase() + topCat.slice(1);
-    insights.push(`Your highest spending category is ${label} (${pct}% of expenses).`);
+    insights.push(`Your highest spending category is ${label} (${formatCurrency(topAmt)}).`);
   }
 
-  // Savings rate
+  // 2. Savings rate + 3. Income vs expenses + 5. Healthy savings
   if (totalIncome > 0) {
     const savingsRate = Math.round((net / totalIncome) * 100);
-    if (savingsRate > 0) {
-      insights.push(`You're saving ${savingsRate}% of your income — great work!`);
-    } else if (savingsRate < 0) {
-      insights.push(`You're spending more than you earn. Consider reviewing your expenses.`);
+    insights.push(`Your savings rate this month is ${savingsRate}%.`);
+
+    const ratio = totalIncome / (totalExpenses || 1);
+    if (ratio >= 2) {
+      insights.push(`Your income is ${Math.round(ratio)}× higher than your expenses.`);
+    } else if (totalExpenses > 0 && (totalExpenses / totalIncome) >= 0.85) {
+      insights.push("Your expenses are close to your income this month.");
+    }
+
+    if (savingsRate > 50) {
+      insights.push("Great job — you saved more than half of your income.");
     }
   }
 
-  // Month-over-month expense change
-  const monthKeys = Object.keys(byMonth || {}).sort();
-  if (monthKeys.length >= 2) {
-    const prev = byMonth[monthKeys[monthKeys.length - 2]]?.expense || 0;
-    const curr = byMonth[monthKeys[monthKeys.length - 1]]?.expense || 0;
-    if (prev > 0) {
-      const change = Math.round(((curr - prev) / prev) * 100);
-      if (Math.abs(change) >= 5) {
-        insights.push(
-          change > 0
-            ? `Expenses rose ${change}% vs last month.`
-            : `Expenses dropped ${Math.abs(change)}% vs last month — great progress!`
-        );
-      }
-    }
+  // 4. Wallet tracking
+  if (walletCount > 0) {
+    const label = walletCount === 1 ? "account" : "accounts";
+    insights.push(`You are currently tracking ${walletCount} ${label}.`);
+  }
+
+  // 6. Expense warning
+  if (totalExpenses > totalIncome && totalIncome >= 0) {
+    insights.push("Warning: your expenses exceeded your income.");
   }
 
   return insights;
