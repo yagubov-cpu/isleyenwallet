@@ -11,19 +11,17 @@ let netWorthChart;
 let savingsRateChart;
 
 export function initCharts(analytics) {
+  if (!window.Chart) return;
+
   const categoryCtx = document.getElementById("chart-category");
   const monthlyCtx = document.getElementById("chart-monthly");
   const walletCtx = document.getElementById("chart-wallets");
-
-  if (!(window.Chart && categoryCtx && monthlyCtx && walletCtx)) {
-    return;
-  }
 
   const categoryData = toCategoryData(analytics.byCategory);
   const monthlyData = toMonthlyData(analytics.byMonth);
   const walletData = toWalletData(analytics.byWalletSpending);
 
-  categoryChart = new Chart(categoryCtx, {
+  if (categoryCtx) categoryChart = new Chart(categoryCtx, {
     type: "pie",
     data: {
       labels: categoryData.labels,
@@ -76,7 +74,7 @@ export function initCharts(analytics) {
     },
   });
 
-  monthlyChart = new Chart(monthlyCtx, {
+  if (monthlyCtx) monthlyChart = new Chart(monthlyCtx, {
     type: "bar",
     data: {
       labels: monthlyData.labels,
@@ -173,7 +171,7 @@ export function initCharts(analytics) {
     },
   });
 
-  walletChart = new Chart(walletCtx, {
+  if (walletCtx) walletChart = new Chart(walletCtx, {
     type: "doughnut",
     data: {
       labels: walletData.labels,
