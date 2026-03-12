@@ -382,13 +382,30 @@
             <div class="chart-wrap-tall"><canvas id="chart-monthly-2"></canvas></div>
           </div>
           <div class="card panel">
-            <div class="panel-header">
+            <div class="panel-header cat-filter-header">
               <div class="panel-title-group">
-                <h3 class="panel-title">Spending by Category</h3>
+                <div class="cat-header-top">
+                  <h3 class="panel-title">Spending by Category</h3>
+                  <select id="cat-year-select" class="cat-year-select"></select>
+                </div>
+                <div class="cat-month-tabs" id="cat-month-tabs">
+                  <button class="cat-month-btn" data-month="01">Jan</button>
+                  <button class="cat-month-btn" data-month="02">Feb</button>
+                  <button class="cat-month-btn" data-month="03">Mar</button>
+                  <button class="cat-month-btn" data-month="04">Apr</button>
+                  <button class="cat-month-btn" data-month="05">May</button>
+                  <button class="cat-month-btn" data-month="06">Jun</button>
+                  <button class="cat-month-btn" data-month="07">Jul</button>
+                  <button class="cat-month-btn" data-month="08">Aug</button>
+                  <button class="cat-month-btn" data-month="09">Sep</button>
+                  <button class="cat-month-btn" data-month="10">Oct</button>
+                  <button class="cat-month-btn" data-month="11">Nov</button>
+                  <button class="cat-month-btn" data-month="12">Dec</button>
+                </div>
                 <span class="panel-sub">Where your money goes</span>
               </div>
             </div>
-            <div class="chart-wrap-tall"><canvas id="chart-category-2"></canvas></div>
+            <div class="chart-wrap-tall" style="position:relative;"><canvas id="chart-category-2"></canvas></div>
           </div>
         </div>
 

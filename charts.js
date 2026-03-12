@@ -10,8 +10,11 @@ let analyticsCategoryChart;
 let netWorthChart;
 let savingsRateChart;
 
-export function initCharts(analytics) {
+export function initCharts(analytics, transactions = []) {
   if (!window.Chart) return;
+
+  // Store raw transactions for per-month category filtering
+  _rawTransactions = transactions;
 
   const categoryCtx = document.getElementById("chart-category");
   const monthlyCtx = document.getElementById("chart-monthly");
@@ -357,8 +360,33 @@ export function initCharts(analytics) {
 
   // ── Spending by Category (donut) ────────────────────────────
   if (analyticsCategoryCtx) {
+    // Center text plugin (scoped to this chart)
+    const centerTextPlugin = {
+      id: "centerText",
+      afterDraw(chart) {
+        if (chart.config.type !== "doughnut") return;
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        const total = chart.config.data.datasets[0].data.reduce((s, v) => s + v, 0);
+        if (!total) return;
+        const cx = (chartArea.left + chartArea.right) / 2;
+        const cy = (chartArea.top + chartArea.bottom) / 2;
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "700 15px 'DM Sans', system-ui, sans-serif";
+        ctx.fillStyle = "#e2e8f0";
+        ctx.fillText(formatCurrency(total), cx, cy - 9);
+        ctx.font = "500 10px 'DM Sans', system-ui, sans-serif";
+        ctx.fillStyle = "#64748b";
+        ctx.fillText("Total Spending", cx, cy + 9);
+        ctx.restore();
+      },
+    };
+
     analyticsCategoryChart = new Chart(analyticsCategoryCtx, {
       type: "doughnut",
+      plugins: [centerTextPlugin],
       data: {
         labels: categoryData.labels,
         datasets: [{
@@ -384,13 +412,22 @@ export function initCharts(analytics) {
             borderColor: "rgba(96,165,250,0.35)",
             borderWidth: 1, padding: 10,
             titleColor: "#e2e8f0", bodyColor: "#94a3b8",
-            callbacks: { label: (ctx) => `${ctx.label}: ${formatCurrency(ctx.parsed)}` },
+            callbacks: {
+              label: (ctx) => {
+                const total = ctx.dataset.data.reduce((s, v) => s + v, 0);
+                const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0;
+                return [`${formatCurrency(ctx.parsed)}`, `${pct}% of total`];
+              },
+            },
           },
         },
         layout: { padding: { top: 4, right: 12, bottom: 4, left: 12 } },
         maintainAspectRatio: false,
       },
     });
+
+    // Wire up the year/month filter controls
+    _initCategoryFilter(analytics);
   }
 
   // ── Savings Rate (line, %) ──────────────────────────────────
@@ -450,8 +487,114 @@ export function initCharts(analytics) {
   }
 }
 
-export function updateCharts(analytics) {
+// ── Category filter state ─────────────────────────────────────
+let _catFilterYear  = null;
+let _catFilterMonth = null;
+let _cachedAnalytics = null;
+
+function _initCategoryFilter(analytics) {
+  _cachedAnalytics = analytics;
+
+  // Populate year dropdown from available months
+  const yearSelect = document.getElementById("cat-year-select");
+  if (!yearSelect) return;
+
+  const years = _getAvailableYears(analytics);
+  const now   = new Date();
+  const curYear  = String(now.getFullYear());
+  const curMonth = String(now.getMonth() + 1).padStart(2, "0");
+
+  // Default selection: current year/month (or latest available)
+  _catFilterYear  = years.includes(curYear)  ? curYear  : (years[years.length - 1] || curYear);
+  _catFilterMonth = curMonth;
+
+  // Build year options
+  yearSelect.innerHTML = years.map(y =>
+    `<option value="${y}" ${y === _catFilterYear ? "selected" : ""}>${y}</option>`
+  ).join("");
+
+  // Year change
+  yearSelect.addEventListener("change", () => {
+    _catFilterYear = yearSelect.value;
+    _applyCategoryFilter();
+  });
+
+  // Month tabs
+  const tabs = document.getElementById("cat-month-tabs");
+  if (tabs) {
+    tabs.querySelectorAll(".cat-month-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        _catFilterMonth = btn.dataset.month;
+        _applyCategoryFilter();
+      });
+    });
+  }
+
+  _applyCategoryFilter();
+}
+
+function _getAvailableYears(analytics) {
+  const keys = Object.keys(analytics.byMonth || {});
+  const yearSet = new Set(keys.map(k => k.slice(0, 4)));
+  const now = String(new Date().getFullYear());
+  yearSet.add(now);
+  return [...yearSet].sort();
+}
+
+function _applyCategoryFilter() {
+  if (!analyticsCategoryChart || !_cachedAnalytics) return;
+
+  // Highlight active month tab
+  document.querySelectorAll(".cat-month-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.month === _catFilterMonth);
+  });
+
+  // Filter transactions for selected year+month
+  const key = `${_catFilterYear}-${_catFilterMonth}`;
+  const monthData = _cachedAnalytics.byMonth[key];
+
+  let byCategory = {};
+  if (monthData && monthData.byCategory) {
+    byCategory = monthData.byCategory;
+  } else if (monthData) {
+    // Fall back: use global byCategory filtered approach
+    byCategory = _filterCategoryForMonth(_catFilterYear, _catFilterMonth);
+  } else {
+    byCategory = _filterCategoryForMonth(_catFilterYear, _catFilterMonth);
+  }
+
+  const entries = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
+  const labels  = entries.map(([k]) => k.charAt(0).toUpperCase() + k.slice(1));
+  const values  = entries.map(([, v]) => v);
+  const colors  = generateColors(values.length);
+
+  analyticsCategoryChart.data.labels = labels;
+  analyticsCategoryChart.data.datasets[0].data   = values;
+  analyticsCategoryChart.data.datasets[0].backgroundColor = colors;
+  analyticsCategoryChart.update();
+}
+
+// Access raw transactions via a stored reference set during updateCharts
+let _rawTransactions = [];
+
+function _filterCategoryForMonth(year, month) {
+  const prefix = `${year}-${month}`;
+  const byCategory = {};
+  for (const tx of _rawTransactions) {
+    if (tx.type !== "expense") continue;
+    if (!tx.date || !tx.date.startsWith(prefix)) continue;
+    const cat = (tx.category || "other").toLowerCase();
+    byCategory[cat] = (byCategory[cat] || 0) + tx.amount;
+  }
+  return byCategory;
+}
+
+export function updateCharts(analytics, transactions = []) {
   if (!window.Chart) return;
+
+  // Store raw transactions for per-month filtering
+  _rawTransactions = transactions;
+  _cachedAnalytics = analytics;
 
   const categoryData = toCategoryData(analytics.byCategory);
   const monthlyData = toMonthlyData(analytics.byMonth);
@@ -495,10 +638,15 @@ export function updateCharts(analytics) {
   }
 
   if (analyticsCategoryChart) {
-    analyticsCategoryChart.data.labels = categoryData.labels;
-    analyticsCategoryChart.data.datasets[0].data = categoryData.values;
-    analyticsCategoryChart.data.datasets[0].backgroundColor = categoryData.colors;
-    analyticsCategoryChart.update();
+    // Refresh year options if needed, then re-apply filter
+    const yearSelect = document.getElementById("cat-year-select");
+    if (yearSelect) {
+      const years = _getAvailableYears(analytics);
+      yearSelect.innerHTML = years.map(y =>
+        `<option value="${y}" ${y === _catFilterYear ? "selected" : ""}>${y}</option>`
+      ).join("");
+    }
+    _applyCategoryFilter();
   }
 
   if (savingsRateChart) {

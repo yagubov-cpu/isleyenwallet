@@ -1073,3 +1073,64 @@ td.tx-actions {
   background: var(--red-dim);
   color: var(--red);
 }
+/* ── Category Chart Filter Controls ─────────────────────────── */
+.cat-filter-header {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+.cat-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cat-year-select {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-2);
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  min-width: 72px;
+  transition: border-color var(--transition), color var(--transition);
+}
+.cat-year-select:focus,
+.cat-year-select:hover {
+  border-color: var(--border-hi);
+  color: var(--text-1);
+}
+.cat-month-tabs {
+  display: flex;
+  gap: 3px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.cat-month-btn {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-3);
+  font-family: inherit;
+  font-size: 0.70rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+.cat-month-btn:hover {
+  background: var(--surface-2);
+  color: var(--text-1);
+  border-color: var(--border-2);
+}
+.cat-month-btn.active {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border-color: rgba(99,179,237,0.30);
+}

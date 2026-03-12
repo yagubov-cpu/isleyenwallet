@@ -51,7 +51,7 @@ export async function initApp() {
   const analytics = computeAnalytics();
   renderAnalytics(els, analytics);
   revealCurrencyElements(); // remove loading opacity now that correct ₼ values are written
-  initCharts(analytics);
+  initCharts(analytics, listTransactions());
 
   // Inject edit modal + toast into DOM
   injectEditModal();
@@ -226,7 +226,7 @@ function wireWalletForm(els) {
     const analytics = computeAnalytics();
     renderAnalytics(els, analytics);
     renderRecentTransactions(els);
-    updateCharts(analytics);
+    updateCharts(analytics, listTransactions());
   });
 }
 
@@ -265,7 +265,7 @@ function wireWalletList(els) {
       const analytics = computeAnalytics();
       renderAnalytics(els, analytics);
       renderRecentTransactions(els);
-      updateCharts(analytics);
+      updateCharts(analytics, listTransactions());
     }
   });
 }
@@ -303,7 +303,7 @@ function wireTransactionForm(els) {
     renderRecentTransactions(els);
     const analytics = computeAnalytics();
     renderAnalytics(els, analytics);
-    updateCharts(analytics);
+    updateCharts(analytics, listTransactions());
   });
 }
 
@@ -781,7 +781,7 @@ function fullRefresh(els) {
   renderRecentTransactions(els);
   const analytics = computeAnalytics();
   renderAnalytics(els, analytics);
-  updateCharts(analytics);
+  updateCharts(analytics, listTransactions());
 }
 
 // Analytics
